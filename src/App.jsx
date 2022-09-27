@@ -29,7 +29,7 @@ function App() {
         </ul>
       </div>
 
-      <label for="default-toggle" className="mb-4 inline-flex relative items-center cursor-pointer">
+      <label htmlFor="default-toggle" className="mb-4 inline-flex relative items-center cursor-pointer">
         <input type="checkbox" value="" id="default-toggle" className="sr-only peer"
           onClick={() => setDavinci(!isDavinci)}
         />
