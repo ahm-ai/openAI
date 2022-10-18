@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "deploy": "aws s3 sync extension/dist/. s3://openaiurl",
     "preview": "vite preview"
   },
   "dependencies": {
