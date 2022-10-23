@@ -100,6 +100,12 @@ export const MainComponent = ({ intent }) => {
 
 
 
+
+
+
+
+
+
     const setK = (e) => {
         const target = e.target.value;
         localStorage.setItem("k", target);
