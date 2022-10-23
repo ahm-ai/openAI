@@ -4,14 +4,35 @@ import { useEffect } from 'react';
 
 let API_TOKEN;
 
-export const MainComponent = ({ intent, isDavinci }) => {
+export const MainComponent = ({ intent }) => {
 
     const [isLoading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
+    const [prompt, setPrompt] = useState("");
+    const [presence, setPresence] = useState(0);
 
     useEffect(() => {
         API_TOKEN = localStorage.getItem("k");
+        //   Create a keyboard shorcut for command + enter
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" && e.metaKey) {
+                console.log("Command + Enter");
+                document.querySelector("#submit").click();
+            }
+        })
     }, [])
+
+    useEffect(() => {
+        // Grammar correction
+        if (intent === 1) {
+            setPrompt("Correct this to standard English:")
+        }
+
+        // Questions
+        if (intent === 2) {
+            setPrompt("I am a highly intelligent question answering bot. Q: ")
+        }
+    }, [intent])
 
     const pasteFunc = async () => {
 
@@ -40,29 +61,16 @@ export const MainComponent = ({ intent, isDavinci }) => {
     }
 
 
-    const convertFunc = async () => {
+    const handleSubmit = async () => {
         setLoading(true)
 
-        let prompt = `Correct this to standard English:\n\n ${message}.`;
-        let aiModel = isDavinci ? "text-davinci-002" : "text-curie-001";
-
-        // Grammar correction
-        if (intent === 1) {
-            prompt = `Correct this to standard English:\n\n ${message}.`;
-        }
-
-        // Q/
-        if (intent === 2) {
-            prompt = `I am a highly intelligent question answering bot. If you ask me a question that is rooted in truth, I will give you the answer. \n\n
-            Q: ${message} \n 
-            A: `;
-        }
-
+        let promptValue = `${prompt}\n\n ${message}.`;
+        let aiModel = "text-davinci-002"
 
         // MAKE API CALL
         const settings = {
             "model": aiModel,
-            "prompt": prompt,
+            "prompt": promptValue,
             "temperature": 0,
             "max_tokens": 2000,
             "top_p": 1,
@@ -103,14 +111,21 @@ export const MainComponent = ({ intent, isDavinci }) => {
 
     return (
         <>
-            <textarea value={message} onChange={(e) => { setMessage(e.target.value) }} rows="4" className="min-h-[10rem]  block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder={intent === 1 ? 'Correct:' : 'Q:'}></textarea>
+
+
+            <textarea value={message} onChange={(e) => {
+                // prevent command + enter from submitting
+                if (e.key === "Enter" && e.metaKey) return
+
+                setMessage(e.target.value)
+            }} rows="4" className="min-h-[10rem]  block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder={intent === 1 ? 'Correct:' : 'Q:'}></textarea>
             <div className=' text-right'>
 
                 <button onClick={clearFunc} type="submit" className="m-5 ml-0 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Clear</button>
 
                 <button onClick={pasteFunc} type="submit" className="m-5 ml-0 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Paste</button>
 
-                <button onClick={() => !isLoading && convertFunc()} type="submit" className="m-5 ml-0 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Convert</button>
+                <button id="submit" onClick={() => !isLoading && handleSubmit()} type="submit" className="m-5 ml-0 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Convert</button>
 
             </div>
             <br></br>
@@ -135,6 +150,18 @@ export const MainComponent = ({ intent, isDavinci }) => {
                         Loading...
                     </button>
                 )}
+            </div>
+
+
+            <div className="grid grid-cols-2 grid-flow-row gap-4 mb-6">
+                <div >
+                    <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Prompt</label>
+                    <input onChange={(e) => setPrompt(e.target.value)} value={prompt} type="email" id="email" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder={prompt} />
+                </div>
+                <div >
+                    <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Presence</label>
+                    <input onChange={(e) => setPresence(e.target.value)} value={presence} type="email" id="email" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder={presence} />
+                </div>
             </div>
 
 
