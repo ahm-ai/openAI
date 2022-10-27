@@ -15,7 +15,6 @@ export const MainComponent = ({ intent }) => {
         API_TOKEN = localStorage.getItem("k");
         //   Create a keyboard shorcut for command + enter
         document.addEventListener("keydown", (e) => {
-            console.log(e.key);
             if (e.key === "Enter" && e.metaKey) {
                 console.log("Command + Enter");
                 document.querySelector("#submit").click();
