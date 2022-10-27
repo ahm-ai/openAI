@@ -15,11 +15,18 @@ export const MainComponent = ({ intent }) => {
         API_TOKEN = localStorage.getItem("k");
         //   Create a keyboard shorcut for command + enter
         document.addEventListener("keydown", (e) => {
+            console.log(e.key);
             if (e.key === "Enter" && e.metaKey) {
                 console.log("Command + Enter");
                 document.querySelector("#submit").click();
             }
+            if (e.key === "c" && e.metaKey) {
+                console.log("Command + C");
+                document.querySelector("#response").focus();
+                document.querySelector("#copy").click();
+            }
         })
+
     }, [])
 
     useEffect(() => {
@@ -137,13 +144,13 @@ export const MainComponent = ({ intent }) => {
             <br></br>
 
             {/* {res} */}
-            <textarea value={res} onChange={(e) => { setRes(e.target.value) }} rows="4" className="min-h-[10rem] block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Response"></textarea>
+            <textarea id="response" value={res} onChange={(e) => { setRes(e.target.value) }} rows="4" className="min-h-[10rem] block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Response"></textarea>
 
 
 
             <div className=' text-right'>
                 {!isLoading && (
-                    <button onClick={copyFunc} type="submit" className="m-5 ml-0 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Copy</button>
+                    <button id="copy" onClick={copyFunc} type="submit" className="m-5 ml-0 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Copy</button>
                 )}
 
                 {isLoading && (
