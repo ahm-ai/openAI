@@ -19,11 +19,11 @@ export const MainComponent = ({ intent }) => {
                 console.log("Command + Enter");
                 document.querySelector("#submit").click();
             }
-            if (e.key === "c" && e.metaKey) {
-                console.log("Command + C");
-                document.querySelector("#response").focus();
-                document.querySelector("#copy").click();
-            }
+            // if (e.key === "c" && e.metaKey) {
+            //     console.log("Command + C");
+            //     document.querySelector("#response").focus();
+            //     document.querySelector("#copy").click();
+            // }
         })
 
     }, [])
