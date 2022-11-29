@@ -71,7 +71,7 @@ export const MainComponent = ({ intent }) => {
         setLoading(true)
 
         let promptValue = `${prompt}\n\n ${message}.`;
-        let aiModel = "text-davinci-002"
+        let aiModel = "text-davinci-003"
 
         // MAKE API CALL
         const settings = {
