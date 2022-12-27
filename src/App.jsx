@@ -1,6 +1,8 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom';
 import './App.css'
 import { MainComponent } from './MainComponent/MainComponent'
+import Speech from './Speech/Speech';
 
 function App() {
 
@@ -25,6 +27,10 @@ function App() {
             <button onClick={() => setActive(2)} className={`${active == 2 ? selectedClass : defaultClass}`} id="dashboard-tab" data-tabs-target="#dashboard" type="button" role="tab" aria-controls="dashboard" aria-selected="false">Q/A</button>
           </li>
 
+          <li className="mr-2" role="presentation">
+            <button onClick={() => setActive(3)} className={`${active == 3 ? selectedClass : defaultClass}`} id="speech-tab" data-tabs-target="#speech" type="button" role="tab" aria-controls="speech" aria-selected="false">Speech</button>
+          </li>
+
         </ul>
       </div>
 
@@ -37,7 +43,13 @@ function App() {
         <span className="mld-3 text-sm font-medium text-gray-900 dark:text-gray-300">Enable Davinci</span> */}
       </label>
 
-      <MainComponent intent={active} />
+      {active == 3 && (
+        <Speech />
+      )}
+      {active < 3 && (
+        <MainComponent intent={active} />
+      )}
+
     </div >
   )
 }
