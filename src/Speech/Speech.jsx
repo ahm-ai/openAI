@@ -1,41 +1,81 @@
-import React, { useEffect } from 'react';
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+import React, { useState, useEffect } from 'react';
 
-const Speech = () => {
-    const {
-        transcript,
-        listening,
-        resetTranscript,
-        browserSupportsSpeechRecognition
-    } = useSpeechRecognition();
 
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = new SpeechRecognition();
+
+function Speech() {
     const [alert, setAlert] = React.useState(false);
 
-    if (!browserSupportsSpeechRecognition) {
-        return <span>Browser doesn't support speech recognition.</span>;
-    }
+    const useRef = React.useRef("");
+    const [transcript, setTranscription] = React.useState('');
+    const [interim, setInterim] = React.useState('');
 
-    const onStart = () => {
-        SpeechRecognition.startListening({ continuous: true })
-    }
+    const listening = true;
+
+    useEffect(() => {
+        recognition.interimResults = true;
+        recognition.lang = 'en-US';
+        recognition.maxAlternatives = 1;
+        recognition.continuous = true;
+
+
+        recognition.addEventListener('result', (e) => {
+            let interimTranscription = '';
+            let finalTranscription = '';
+            for (let i = e.resultIndex; i < e.results.length; i++) {
+
+                if (e.results[i].isFinal) {
+                    console.log("🚀 CHECKING :", e.results[i]);
+                    finalTranscription += e.results[i][0].transcript;
+                } else {
+                    interimTranscription += e.results[i][0].transcript;
+                }
+            }
+            console.log({ e, finalTranscription, interimTranscription });
+
+            if (finalTranscription.length > 1) {
+                useRef.current = useRef.current + finalTranscription;
+                setTranscription(useRef.current);
+                setInterim('')
+                finalTranscription = '';
+                interimTranscription = '';
+            } else {
+                setInterim(interimTranscription)
+            }
+
+        });
+
+        recognition.onspeechend = () => {
+            recognition.stop();
+            console.log('Speech recognition has stopped.');
+            // recognition.start();
+            setTimeout(function () { recognition.start(); }, 400);
+        }
+        // recognition.addEventListener('end', () => {
+        //     console.log("END");
+        //     recognition.start();
+        // });
+
+        setTimeout(() => {
+            recognition.start();
+        }, 500)
+
+
+
+        return () => {
+            console.log("CLOSED");
+            recognition.removeEventListener('result', () => { });
+            recognition.removeEventListener('end', () => { });
+        };
+    }, []);
+
+
 
     const saveInLocal = () => {
         const data = document.getElementById("save_transcript_as");
         localStorage.setItem(`T:${data.value}`, transcript);
     }
-
-    useEffect(() => {
-        // console.log(transcript);
-        // get last 10 words in the string with a loop
-        const lastChars = transcript.substring(transcript.length - 50, transcript.length);
-
-        if (lastChars.includes('Angel') || lastChars.includes('angel')) {
-            setAlert(true)
-        }
-
-        console.log(lastChars);
-
-    }, [transcript])
 
     const onClickClose = () => {
         setAlert(false)
@@ -55,13 +95,8 @@ const Speech = () => {
 
             <div className='mb-3'>
 
-                <button onClick={onStart} type="button" className="py-2 px-3 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 mr-1">
+                <button type="button" className="py-2 px-3 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 mr-1">
                     Start</button>
-
-                <button onClick={SpeechRecognition.stopListening} type="button" className="py-2 px-3 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800  mr-1">
-                    Stop</button>
-                <button onClick={resetTranscript} type="button" className="py-2 px-3 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                    Reset</button>
 
             </div>
 
@@ -76,11 +111,13 @@ const Speech = () => {
                 </div>
             </form>
 
+            {transcript} {interim}
 
-            <label htmlFor="message" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Transcript</label>
-            <textarea id="message" rows="4" className=" h-[100vh] block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="" value={transcript}></textarea>
-
+            {/* <label htmlFor="message" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Transcript</label>
+            <textarea id="message" rows="4" className=" h-[100vh] block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder=""
+                value={transcript}></textarea> */}
         </div>
     );
-};
+}
+
 export default Speech;

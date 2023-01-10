@@ -4,9 +4,13 @@ import './App.css'
 import { MainComponent } from './MainComponent/MainComponent'
 import Speech from './Speech/Speech';
 
+function getTabNumber() {
+  return window.location.href.includes('speech') ? 3 : 1
+}
+
 function App() {
 
-  const [active, setActive] = useState(1);
+  const [active, setActive] = useState(getTabNumber());
 
   const selectedClass = `inline-block p-4 rounded-t-lg border-b-2 border-transparent text-blue-600 hover:text-blue-600 dark:text-blue-500 dark:hover:text-blue-500 border-blue-600 dark:border-blue-500`;
   const defaultClass = `inline-block p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300`
@@ -46,9 +50,9 @@ function App() {
       {active == 3 && (
         <Speech />
       )}
-      {active < 3 && (
+      {/* {active < 3 && (
         <MainComponent intent={active} />
-      )}
+      )} */}
 
     </div >
   )
