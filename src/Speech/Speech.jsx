@@ -10,6 +10,7 @@ function Speech() {
     const useRef = React.useRef("");
     const [transcript, setTranscription] = React.useState('');
     const [interim, setInterim] = React.useState('');
+    const [enableAutoScroll, setEnableAutoScroll] = React.useState(true);
 
     const listening = true;
 
@@ -19,8 +20,10 @@ function Speech() {
 
     useEffect(() => {
         // Scroll to bottom of textarea
-        var textarea = document.getElementById('message');
-        textarea.scrollTop = textarea.scrollHeight;
+        if (enableAutoScroll) {
+            const textarea = document.getElementById('message');
+            textarea.scrollTop = textarea.scrollHeight;
+        }
     }, [transcript, interim]);
 
     const start = () => {
@@ -96,6 +99,10 @@ function Speech() {
         console.log(lastChars);
     }
 
+    const toggleAutoScroll = () => {
+        setEnableAutoScroll(!enableAutoScroll)
+    }
+
     return (
         <div>
 
@@ -125,8 +132,10 @@ function Speech() {
                     </div>
                 </form>
 
-                <div className=' p-2'>
-                    <p className=' text-gray-600 mb-2'> Microphone: {listening ? (<span className="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-green-200 dark:text-green-900">On</span>) : <span className="bg-red-100 text-red-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-red-200 dark:text-red-900">Off</span>}</p>
+                <div className=' px-4'>
+                    <p className=' text-gray-600 '> Microphone: {listening ? (<span className="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-green-200 dark:text-green-900">On</span>) : <span className="bg-red-100 text-red-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-red-200 dark:text-red-900">Off</span>}</p>
+
+                    <button onClick={toggleAutoScroll} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm h-6 px-4  py-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{enableAutoScroll ? 'AutoScrollEnabled' : 'ScrollDisabled'}</button>
                 </div>
             </div>
 
