@@ -50,9 +50,9 @@ function App() {
       {active == 3 && (
         <Speech />
       )}
-      {/* {active < 3 && (
+      {active < 3 && (
         <MainComponent intent={active} />
-      )} */}
+      )}
 
     </div >
   )

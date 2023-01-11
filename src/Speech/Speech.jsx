@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition = new SpeechRecognition();
 
 function Speech() {
@@ -14,63 +14,64 @@ function Speech() {
     const listening = true;
 
     useEffect(() => {
+        start()
+    }, []);
+
+    const start = () => {
+        console.log("Starting ....")
+        SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+
         recognition.interimResults = true;
         recognition.lang = 'en-US';
         recognition.maxAlternatives = 1;
         recognition.continuous = true;
 
-
-        recognition.addEventListener('result', (e) => {
+        recognition.onresult = (e) => {
             let interimTranscription = '';
             let finalTranscription = '';
             for (let i = e.resultIndex; i < e.results.length; i++) {
 
                 if (e.results[i].isFinal) {
-                    console.log("🚀 CHECKING :", e.results[i]);
                     finalTranscription += e.results[i][0].transcript;
                 } else {
                     interimTranscription += e.results[i][0].transcript;
                 }
             }
-            console.log({ e, finalTranscription, interimTranscription });
+
 
             if (finalTranscription.length > 1) {
                 useRef.current = useRef.current + finalTranscription;
                 setTranscription(useRef.current);
                 setInterim('')
+                checkForText(finalTranscription)
                 finalTranscription = '';
                 interimTranscription = '';
             } else {
                 setInterim(interimTranscription)
+                checkForText(interimTranscription)
+                finalTranscription = '';
             }
 
-        });
+        }
+
+        recognition.onaudioend = () => {
+            console.log('[onaudioend] :: Audio recognition has stopped.');
+            start()
+        }
+
+        recognition.onsoundend = (event) => {
+            console.log('[*] Sound has stopped being received');
+        }
 
         recognition.onspeechend = () => {
             recognition.stop();
-            console.log('Speech recognition has stopped.');
-            // recognition.start();
-            setTimeout(function () { recognition.start(); }, 400);
+            console.log('[onspeechend] :: Speech recognition has stopped.');
+            start()
         }
-        // recognition.addEventListener('end', () => {
-        //     console.log("END");
-        //     recognition.start();
-        // });
 
-        setTimeout(() => {
-            recognition.start();
-        }, 500)
-
-
-
-        return () => {
-            console.log("CLOSED");
-            recognition.removeEventListener('result', () => { });
-            recognition.removeEventListener('end', () => { });
-        };
-    }, []);
-
-
+        recognition.start();
+    }
 
     const saveInLocal = () => {
         const data = document.getElementById("save_transcript_as");
@@ -81,15 +82,24 @@ function Speech() {
         setAlert(false)
     }
 
+    const checkForText = (text = "") => {
+        const lastChars = text.substring(text.length - 50, text.length);
+        if (lastChars.includes('Angel') || lastChars.includes('angel')) {
+            setAlert(true)
+        }
+        console.log(lastChars);
+    }
+
     return (
         <div>
 
             {alert && (
-                <div onClick={onClickClose} class="p-4 mb-4 text-sm text-green-700 bg-green-100 rounded-lg dark:bg-green-200 dark:text-green-800" role="alert">
+                <div onClick={onClickClose} className="p-4 mb-4 text-sm text-green-700 bg-green-100 rounded-lg dark:bg-green-200 dark:text-green-800" role="alert">
                     <span class="font-medium">Question Asked!</span>
                 </div>
             )}
 
+            {/* <button onClick={onClickEnd}>END</button> */}
 
             <p className=' text-gray-600 mb-2'> Microphone: {listening ? (<span className="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-green-200 dark:text-green-900">On</span>) : <span className="bg-red-100 text-red-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-red-200 dark:text-red-900">Off</span>}</p>
 
@@ -111,13 +121,14 @@ function Speech() {
                 </div>
             </form>
 
-            {transcript} {interim}
-
-            {/* <label htmlFor="message" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Transcript</label>
+            <label htmlFor="message" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Transcript</label>
             <textarea id="message" rows="4" className=" h-[100vh] block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder=""
-                value={transcript}></textarea> */}
+                defaultValue={transcript + interim}></textarea>
         </div>
     );
 }
+
+
+
 
 export default Speech;

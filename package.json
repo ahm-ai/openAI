@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "deploy": "aws s3 sync extension/dist/. s3://openaiurl",
+    "invalidate": "aws cloudfront create-invalidation --distribution-id E22SWECWI5WZHF --paths '/*'",
     "preview": "vite preview"
   },
   "dependencies": {
