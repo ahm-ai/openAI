@@ -23,7 +23,7 @@ export const MainComponent = ({ intent }) => {
   useEffect(() => {
     // Grammar correction
     if (intent === 1) {
-      setPrompt("Correct this to standard English:");
+      setPrompt("Correct this to friendly semi-caual English:");
     }
 
     // Questions
@@ -62,22 +62,28 @@ export const MainComponent = ({ intent }) => {
     setLoading(true);
 
     let promptValue = `${prompt}\n\n ${message}.`;
-    let aiModel = "text-davinci-003";
+    let aiModel = "gpt-3.5-turbo";
 
     // MAKE API CALL
     const settings = {
       model: aiModel,
-      prompt: promptValue,
       temperature: 0,
       max_tokens: 2000,
       top_p: 1,
       frequency_penalty: 0,
       presence_penalty: 0,
+      messages: [
+        {
+          role: "user",
+          content: promptValue,
+        },
+      ],
     };
 
-    fetch("https://api.openai.com/v1/completions", {
+    fetch("https://saoc6n2aba.execute-api.us-east-1.amazonaws.com/test/dev", {
       body: JSON.stringify(settings),
       headers: {
+        destination: "https://api.openai.com/v1/chat/completions",
         Authorization: `Bearer ${API_TOKEN}`,
         "Content-Type": "application/json",
       },
@@ -88,7 +94,8 @@ export const MainComponent = ({ intent }) => {
         console.log(resp);
         setLoading(false);
         try {
-          let res = resp.choices[0].text.slice(2);
+          let openAiResponse = JSON.parse(resp.data);
+          let res = openAiResponse.choices[0].message.content;
           setRes(res);
         } catch (error) {
           setRes(error);
