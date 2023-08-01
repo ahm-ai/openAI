@@ -62,7 +62,7 @@ export const MainComponent = ({ intent }) => {
     setLoading(true);
 
     let promptValue = `${promptType ? promptType : prompt}\n\n ${message}.`;
-    let aiModel = "gpt-3.5-turbo";
+    let aiModel = "gpt-4";
 
     // MAKE API CALL
     const settings = {
