@@ -23,7 +23,7 @@ export const MainComponent = ({ intent }) => {
   useEffect(() => {
     // Grammar correction
     if (intent === 1) {
-      setPrompt("Correct this to friendly semi-caual English:");
+      setPrompt("Correct this to friendly English:");
     }
 
     // Questions
@@ -58,10 +58,10 @@ export const MainComponent = ({ intent }) => {
     console.log(copied);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (promptType) => {
     setLoading(true);
 
-    let promptValue = `${prompt}\n\n ${message}.`;
+    let promptValue = `${promptType ? promptType : prompt}\n\n ${message}.`;
     let aiModel = "gpt-3.5-turbo";
 
     // MAKE API CALL
@@ -138,6 +138,17 @@ export const MainComponent = ({ intent }) => {
           className="m-5 ml-0 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
         >
           Paste
+        </button>
+
+        <button
+          id="submit"
+          onClick={() =>
+            !isLoading && handleSubmit("Correct this to English: ")
+          }
+          type="submit"
+          className="m-5 ml-0 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+        >
+          Standard
         </button>
 
         <button
