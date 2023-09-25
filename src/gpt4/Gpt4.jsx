@@ -3,6 +3,7 @@ import ReactMarkdown from "react-markdown";
 
 let API_TOKEN = "";
 const BASE_URL_ = `https://pdyyay3o14.execute-api.us-east-1.amazonaws.com/dev/v1/appendJson`;
+const DEFAULT_KEY = (Math.random() * 100).toString();
 
 const debounce = (func, delay) => {
   let timer;
@@ -87,8 +88,10 @@ export const Gpt4 = () => {
 
   useEffect(() => {
     let savedKey = localStorage.getItem("s3Key");
-    setKeyName(savedKey || "Document_KEY");
-    console.log({ savedKey });
+    savedKey = savedKey || DEFAULT_KEY;
+
+    setKeyName(savedKey);
+
     //   Create a keyboard shorcut for command + enter
     document.addEventListener("keydown", (e) => {
       if (e.key === "Enter" && e.metaKey) {
