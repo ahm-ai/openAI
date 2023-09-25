@@ -4,49 +4,29 @@ import ReactMarkdown from "react-markdown";
 let API_TOKEN = "";
 
 export const Gpt4 = () => {
-  const [input, setInput] = useState("");
-  const [maxTokens, setMaxTokens] = useState(3499); // Default max tokens
+  const [input, setInput] = useState(null);
+  const [keyName, setKeyName] = useState("s3Key"); // Default max tokens
   const [conversation, setConversation] = useState([]);
-
-  useEffect(() => {
-    API_TOKEN = localStorage.getItem("k");
-    //   Create a keyboard shorcut for command + enter
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && e.metaKey) {
-        console.log("Command + Enter");
-        document.querySelector("#submit").click();
-      }
-    });
-  }, []);
 
   const handleInputChange = (e) => {
     setInput(e.target.value);
   };
 
-  const handleMaxTokensChange = (e) => {
-    setMaxTokens(Number(e.target.value));
+  const setS3KeyName = (e) => {
+    localStorage.setItem(e.target.value);
+    setKeyName(e.target.value);
   };
 
   const handleSend = async () => {
     const OPENAI_API_KEY = API_TOKEN; // Replace with your API key
-    const apiEndpoint =
-      "https://saoc6n2aba.execute-api.us-east-1.amazonaws.com/test/dev";
+    // https://pdyyay3o14.execute-api.us-east-1.amazonaws.com/dev/v1/appendJson/{objectKey}
+    const apiEndpoint = `https://pdyyay3o14.execute-api.us-east-1.amazonaws.com/dev/v1/appendJson/${keyName}`;
 
-    const payload = {
-      model: "gpt-4",
-      messages: [
-        ...conversation,
-        {
-          role: "user",
-          content: input,
-        },
-      ],
-      temperature: 1,
-      max_tokens: maxTokens,
-      top_p: 1,
-      frequency_penalty: 0,
-      presence_penalty: 0,
-    };
+    let payload;
+
+    if (input) {
+      payload = [...conversation, { role: "user", content: input }];
+    }
 
     const requestOptions = {
       method: "POST",
@@ -60,21 +40,31 @@ export const Gpt4 = () => {
 
     try {
       const response = await fetch(apiEndpoint, requestOptions);
-      const resJson = await response.json();
-      const data = JSON.parse(resJson.data);
-
+      const data = await response.json();
       console.log(data);
-      const assistantMessage = data.choices[0].message.content;
-      setConversation([
-        ...conversation,
-        { role: "user", content: input },
-        { role: "assistant", content: assistantMessage },
-      ]);
+
+      if (data.updatedData) {
+        setConversation([...data.updatedData]);
+      }
+
       setInput("");
     } catch (error) {
       console.error("Error:", error);
     }
   };
+
+  useEffect(() => {
+    API_TOKEN = localStorage.getItem("s3Key");
+    //   Create a keyboard shorcut for command + enter
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && e.metaKey) {
+        console.log("Command + Enter");
+        document.querySelector("#submit").click();
+      }
+    });
+
+    handleSend();
+  }, []);
 
   return (
     <div>
@@ -120,9 +110,9 @@ export const Gpt4 = () => {
       </form>
       <input
         type="number"
-        value={maxTokens}
-        onChange={handleMaxTokensChange}
-        placeholder="Max tokens... 8k max"
+        value={keyName}
+        onChange={setS3KeyName}
+        placeholder="Key"
       />
     </div>
   );

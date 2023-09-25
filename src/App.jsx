@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./App.css";
 import { MainComponent } from "./MainComponent/MainComponent";
@@ -11,6 +11,20 @@ function getTabNumber() {
 
 function App() {
   const [active, setActive] = useState(getTabNumber());
+
+  useEffect(() => {
+    if (getTabNumber() === 3) {
+      setActive(3);
+    } else {
+      const activeTab = localStorage.getItem("active");
+      setActive(Number(activeTab));
+    }
+  }, []);
+
+  const setSelection = (numb) => {
+    setActive(numb);
+    localStorage.setItem("active", numb);
+  };
 
   const selectedClass = `inline-block p-4 rounded-t-lg border-b-2 border-transparent text-blue-600 hover:text-blue-600 dark:text-blue-500 dark:hover:text-blue-500 border-blue-600 dark:border-blue-500`;
   const defaultClass = `inline-block p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300`;
@@ -26,7 +40,7 @@ function App() {
         >
           <li className="mr-2" role="presentation">
             <button
-              onClick={() => setActive(1)}
+              onClick={() => setSelection(1)}
               className={`${active == 1 ? selectedClass : defaultClass}`}
               id="profile-tab"
               data-tabs-target="#profile"
@@ -41,7 +55,7 @@ function App() {
 
           <li className="mr-2" role="presentation">
             <button
-              onClick={() => setActive(2)}
+              onClick={() => setSelection(2)}
               className={`${active == 2 ? selectedClass : defaultClass}`}
               id="dashboard-tab"
               data-tabs-target="#dashboard"
@@ -56,7 +70,7 @@ function App() {
 
           <li className="mr-2" role="presentation">
             <button
-              onClick={() => setActive(3)}
+              onClick={() => setSelection(3)}
               className={`${active == 3 ? selectedClass : defaultClass}`}
               id="speech-tab"
               data-tabs-target="#speech"
