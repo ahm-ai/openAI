@@ -5,7 +5,7 @@ let API_TOKEN = "";
 
 export const Gpt4 = () => {
   const [input, setInput] = useState(null);
-  const [keyName, setKeyName] = useState("s3Key"); // Default max tokens
+  const [keyName, setKeyName] = useState("DocKey"); // Default max tokens
   const [conversation, setConversation] = useState([]);
 
   const handleInputChange = (e) => {
@@ -13,8 +13,10 @@ export const Gpt4 = () => {
   };
 
   const setS3KeyName = (e) => {
-    localStorage.setItem(e.target.value);
-    setKeyName(e.target.value);
+    const key = e.target.value;
+    console.log(key);
+    localStorage.setItem("s3Key", key);
+    setKeyName(key);
   };
 
   const handleSend = async () => {
@@ -54,7 +56,8 @@ export const Gpt4 = () => {
   };
 
   useEffect(() => {
-    API_TOKEN = localStorage.getItem("s3Key");
+    let savedKey = localStorage.getItem("s3Key");
+    setKeyName(savedKey || "DocKey");
     //   Create a keyboard shorcut for command + enter
     document.addEventListener("keydown", (e) => {
       if (e.key === "Enter" && e.metaKey) {
@@ -108,12 +111,7 @@ export const Gpt4 = () => {
           </button>
         </div>
       </form>
-      <input
-        type="number"
-        value={keyName}
-        onChange={setS3KeyName}
-        placeholder="Key"
-      />
+      <input value={keyName} onChange={setS3KeyName} placeholder={keyName} />
     </div>
   );
 };
