@@ -78,7 +78,7 @@ export const Gpt4 = () => {
 
   return (
     <div>
-      <div className="w-full h-[60vh] p-4 mb-4 text-xs border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
+      <div className="overflow-y-scroll w-full min-h-[60vh] p-4 mb-4 text-xs border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
         {conversation.map((message, index) => (
           <div key={index} className="mb-4">
             <strong>{message.role === "user" ? "You: " : "Assistant: "}</strong>
