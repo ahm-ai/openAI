@@ -2,10 +2,19 @@ import React, { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 
 let API_TOKEN = "";
+const BASE_URL_ = `https://pdyyay3o14.execute-api.us-east-1.amazonaws.com/dev/v1/appendJson`;
+
+const debounce = (func, delay) => {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => func(...args), delay);
+  };
+};
 
 export const Gpt4 = () => {
   const [input, setInput] = useState(null);
-  const [keyName, setKeyName] = useState("DocKey"); // Default max tokens
+  const [keyName, setKeyName] = useState(null); // Default max tokens
   const [conversation, setConversation] = useState([]);
 
   const handleInputChange = (e) => {
@@ -14,15 +23,30 @@ export const Gpt4 = () => {
 
   const setS3KeyName = (e) => {
     const key = e.target.value;
-    console.log(key);
     localStorage.setItem("s3Key", key);
     setKeyName(key);
   };
 
-  const handleSend = async () => {
+  async function deleteAllObjects() {
+    try {
+      const response = await fetch(`${BASE_URL_}/mykey.json?action=deleteAll`, {
+        method: "POST",
+      });
+      const result = await response.json();
+      if (response.ok) {
+        setConversation([]);
+      } else {
+        alert(`Failed to delete objects: ${result.error}`);
+      }
+    } catch (error) {
+      alert("An error occurred while deleting all objects.");
+    }
+  }
+
+  const handleSend = async (localKey) => {
     const OPENAI_API_KEY = API_TOKEN; // Replace with your API key
     // https://pdyyay3o14.execute-api.us-east-1.amazonaws.com/dev/v1/appendJson/{objectKey}
-    const apiEndpoint = `https://pdyyay3o14.execute-api.us-east-1.amazonaws.com/dev/v1/appendJson/${keyName}`;
+    const apiEndpoint = `${BASE_URL_}/${keyName || localKey}`;
 
     let payload;
 
@@ -45,7 +69,11 @@ export const Gpt4 = () => {
       const data = await response.json();
       console.log(data);
 
-      if (data.updatedData) {
+      if (data.updatedData && payload) {
+        setConversation([...payload]);
+      }
+
+      if (!payload) {
         setConversation([...data.updatedData]);
       }
 
@@ -55,9 +83,12 @@ export const Gpt4 = () => {
     }
   };
 
+  const debouncedHandleSend = debounce(handleSend, 300); // 300ms delay
+
   useEffect(() => {
     let savedKey = localStorage.getItem("s3Key");
-    setKeyName(savedKey || "DocKey");
+    setKeyName(savedKey || "Document_KEY");
+    console.log({ savedKey });
     //   Create a keyboard shorcut for command + enter
     document.addEventListener("keydown", (e) => {
       if (e.key === "Enter" && e.metaKey) {
@@ -66,7 +97,9 @@ export const Gpt4 = () => {
       }
     });
 
-    handleSend();
+    setTimeout(() => {
+      debouncedHandleSend(savedKey);
+    }, 300);
   }, []);
 
   return (
@@ -94,8 +127,9 @@ export const Gpt4 = () => {
             placeholder="Your message..."
           ></textarea>
           <button
-            onClick={handleSend}
+            onClick={debouncedHandleSend}
             type="button"
+            id="submit"
             class="inline-flex justify-center p-2 text-blue-600 rounded-full cursor-pointer hover:bg-blue-100 dark:text-blue-500 dark:hover:bg-gray-600"
           >
             <svg
@@ -111,7 +145,18 @@ export const Gpt4 = () => {
           </button>
         </div>
       </form>
-      <input value={keyName} onChange={setS3KeyName} placeholder={keyName} />
+      <div className="flex">
+        <input value={keyName} onChange={setS3KeyName} placeholder={keyName} />
+        <div className="App">
+          <button
+            onClick={deleteAllObjects}
+            className="bg-blue-500 text-white p-1 text-xs rounded"
+          >
+            Clean
+          </button>
+          {/* ... (Existing JSX elements) */}
+        </div>
+      </div>
     </div>
   );
 };
