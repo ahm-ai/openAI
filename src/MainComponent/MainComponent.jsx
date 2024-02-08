@@ -23,7 +23,7 @@ export const MainComponent = ({ intent }) => {
   useEffect(() => {
     // Grammar correction
     if (intent === 1) {
-      setPrompt("Correct this to friendly English:");
+      setPrompt("Correct grammar:");
     }
 
     // Questions
@@ -62,12 +62,12 @@ export const MainComponent = ({ intent }) => {
     setLoading(true);
 
     let promptValue = `${promptType ? promptType : prompt}\n\n ${message}.`;
-    let aiModel = "gpt-4";
+    let aiModel = "gpt-4-turbo-preview";
 
     // MAKE API CALL
     const settings = {
       model: aiModel,
-      temperature: 0,
+      temperature: 1,
       max_tokens: 2000,
       top_p: 1,
       frequency_penalty: 0,
