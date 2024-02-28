@@ -23,7 +23,7 @@ export const MainComponent = ({ intent }) => {
   useEffect(() => {
     // Grammar correction
     if (intent === 1) {
-      setPrompt("Correct grammar:");
+      setPrompt("Correct grammar only:");
     }
 
     // Questions
